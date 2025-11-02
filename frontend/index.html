@@ -54,6 +54,39 @@
       <button type="submit" class="btn">Submit Listing</button>
     </form>
 
+    <section class="card" id="bulk-card">
+      <h2>Bulk Listing (comma-separated seats)</h2>
+        <form id="bulk-form">
+          <div class="grid">
+          <label>
+            <span>Marketplace</span>
+          <select name="marketplace" required>
+            <option>StubHub</option>
+            <option>Marketplace A</option>
+          </select>
+        </label>
+       <label>
+        <span>Event</span>
+          <select name="event_id" required id="bulk-event"></select>
+        </label>
+        <label>
+        <span>Section</span>
+          <input name="section" placeholder="e.g., GA" required />
+        </label>
+        <label>
+       <span>Row (optional)</span>
+          <input name="row" placeholder="e.g., Front" />
+        </label>
+        <label>
+          <span>Seats (comma separated)</span>
+            <input name="seats" placeholder="e.g., 10,11,12" required />
+        </label>
+        </div>
+        <button type="submit" class="btn">Submit Bulk</button>
+      </form>
+        <div id="bulk-result" class="result" aria-live="polite"></div>
+        </section>
+
     <div id="result" class="result" aria-live="polite"></div>
   </main>
 
