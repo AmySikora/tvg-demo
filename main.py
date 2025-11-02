@@ -5,6 +5,28 @@ from typing import List, Optional
 from datetime import datetime
 import uuid
 
+import json, os
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+os.makedirs(DATA_DIR, exist_ok=True)
+DATA_FILE = os.path.join(DATA_DIR, 'tickets.json')
+
+
+def load_tickets():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'r') as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+def save_tickets(rows):
+    try:
+        with open(DATA_FILE, 'w') as f:
+            json.dump(rows, f)
+    except Exception:
+        pass
+
 app = FastAPI(title="Ticket VeriGuard Demo API", version="0.1.0")
 
 app.add_middleware(
@@ -26,8 +48,17 @@ EVENTS = {
     }
 }
 
+EVENTS.update({
+    "festival-summer-2026-day1": {
+        "event_id": "festival-summer-2026-day1",
+        "name": "Summer Fest — Day 1",
+        "venue": "Seattle Center",
+        "date": "2026-07-10T12:00:00-07:00",
+        }
+})
+
 # In-memory store for demo
-TICKETS: List[dict] = []
+TICKETS: List[dict] = load_tickets()
 
 class ListRequest(BaseModel):
     marketplace: str = Field(..., description="e.g., 'StubHub' or 'Marketplace A'")
@@ -42,6 +73,30 @@ class ListResponse(BaseModel):
     duplicate_of_id: Optional[str] = None
     message: str
     ticket: dict
+
+class BulkListRequest(BaseModel):
+    marketplace: str
+    event_id: str
+    section: str
+    row: Optional[str] = None
+    seats: List[str] # e.g., ["10","11","12"]
+
+class BulkListResult(BaseModel):
+    results: List[ListResponse]
+
+@app.post("/marketplace/bulk_list", response_model=BulkListResult)
+def bulk_list(req: BulkListRequest):
+    out: List[ListResponse] = []
+    for s in req.seats:
+        single = ListRequest(
+        marketplace=req.marketplace,
+        event_id=req.event_id,
+        section=req.section,
+        row=req.row,
+        seat=s,
+)
+    out.append(list_ticket(single)) # reuse core logic
+    return {"results": out}
 
 @app.get("/health")
 def health():
@@ -106,6 +161,9 @@ def list_ticket(req: ListRequest):
 
     approved = {**new_ticket, "decision": "APPROVED"}
     TICKETS.append(approved)
+    save_tickets(TICKETS)
+    TICKETS.append(blocked)
+    save_tickets(TICKETS)
     return ListResponse(
         id=approved["id"],
         decision="APPROVED",
