@@ -22,3 +22,16 @@ export async function fetchTickets(){
   const res = await fetch(`${API_BASE}/tickets`);
   return res.json();
 }
+
+export async function bulkList(payload){
+  const res = await fetch(`${API_BASE}/marketplace/bulk_list`, {
+  method: "POST",
+  headers: {"Content-Type":"application/json"},
+  body: JSON.stringify(payload)
+  });
+  if(!res.ok){
+  const err = await res.json().catch(()=>({detail:"Error"}));
+  throw new Error(err.detail || "Request failed");
+  }
+  return res.json();
+  }
