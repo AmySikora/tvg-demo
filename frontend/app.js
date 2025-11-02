@@ -40,6 +40,41 @@ if(onSimulator){
   }
 }
 
+const bulkForm = document.getElementById('bulk-form');
+if(bulkForm){
+const sel = document.getElementById('bulk-event');
+fetchEvents().then(events => {
+events.forEach(e => {
+const o = document.createElement('option');
+o.value = e.event_id; o.textContent = `${e.name} — ${new Date(e.date).toLocaleString()}`;
+sel.appendChild(o);
+});
+});
+bulkForm.addEventListener('submit', async (e) => {
+e.preventDefault();
+const fd = new FormData(bulkForm);
+const seats = (fd.get('seats')||'').split(',').map(s=>s.trim()).filter(Boolean);
+const payload = {
+marketplace: fd.get('marketplace'),
+event_id: fd.get('event_id'),
+section: fd.get('section'),
+row: fd.get('row')||null,
+seats,
+};
+try{
+const res = await bulkList(payload);
+const okCount = res.results.filter(r=>r.decision==='APPROVED').length;
+const badCount = res.results.length - okCount;
+document.getElementById('bulk-result').innerHTML =
+`<div class="alert ${badCount? 'bad':'ok'}"><strong>Bulk complete</strong> — `+
+`${okCount} approved, ${badCount} blocked</div>`;
+bulkForm.reset();
+}catch(err){
+document.getElementById('bulk-result').innerHTML =
+`<div class="alert bad"><strong>Error</strong> — ${err.message}</div>`;
+}
+});
+}
 if(onDashboard){
   async function load(){
     const rows = await fetchTickets();
