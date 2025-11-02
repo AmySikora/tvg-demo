@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ticket VeriGuard — Marketplace Simulator</title>
+  <link rel="icon" href="favicon_logo.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="brand">
+      <img src="logo.svg" alt="Ticket VeriGuard" class="logo" />
+      <span>Ticket VeriGuard</span>
+    </div>
+    <nav>
+      <a href="index.html" class="active">Simulator</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>Marketplace Simulator</h1>
+    <p class="muted">Simulate a ticket listing from a marketplace. If the same seat is already listed on another marketplace, we block the duplicate.</p>
+
+    <form id="list-form" class="card">
+      <div class="grid">
+        <label>
+          <span>Marketplace</span>
+          <select name="marketplace" required>
+            <option>StubHub</option>
+            <option>Marketplace A</option>
+          </select>
+        </label>
+        <label>
+          <span>Event</span>
+          <select name="event_id" required id="event-select"></select>
+        </label>
+        <label>
+          <span>Section</span>
+          <input name="section" placeholder="e.g., 135" required />
+        </label>
+        <label>
+          <span>Row (optional)</span>
+          <input name="row" placeholder="e.g., J" />
+        </label>
+        <label>
+          <span>Seat</span>
+          <input name="seat" placeholder="e.g., 12" required />
+        </label>
+      </div>
+      <button type="submit" class="btn">Submit Listing</button>
+    </form>
+
+    <div id="result" class="result" aria-live="polite"></div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

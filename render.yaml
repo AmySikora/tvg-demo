@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tvg-demo-api
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    healthCheckPath: /health
+    runtime: python
+    region: oregon
