@@ -7,7 +7,7 @@ const onDashboard = document.getElementById('tickets-table');
 if (onSimulator) {
   const sel = document.getElementById('event-select');
   fetchEvents().then(events => {
-    sel.innerHTML = ''; // clear any hardcoded option
+    sel.innerHTML = '';
     events.forEach(e => {
       const o = document.createElement('option');
       o.value = e.event_id;
@@ -91,10 +91,15 @@ if (onDashboard) {
     tbody.innerHTML = '';
     rows.slice().reverse().forEach(t => {
       const tr = document.createElement('tr');
-      tr.className = t.decision === 'BLOCKED_DUPLICATE' ? 'bad' : 'ok';
+      const cls = t.decision === 'BLOCKED_DUPLICATE' ? 'bad' : 'ok';
+      const decisionBadge =
+        t.decision === 'BLOCKED_DUPLICATE'
+          ? `<span class="badge bad">Blocked</span>`
+          : `<span class="badge ok">Approved</span>`;
+      tr.className = cls;
       tr.innerHTML = `
         <td>${t.id || ''}</td>
-        <td>${t.decision || ''}</td>
+        <td>${decisionBadge}</td>
         <td>${t.marketplace || ''}</td>
         <td>${t.event_id || ''}</td>
         <td>${t.section || ''}</td>
