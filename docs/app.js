@@ -1,4 +1,4 @@
-import { fetchEvents, listTicket, fetchTickets, bulkList } from '../api.js';
+import { fetchEvents, listTicket, fetchTickets, bulkList } from './api.js';
 
 const onSimulator = document.getElementById('list-form');
 const onDashboard = document.getElementById('tickets-table');
