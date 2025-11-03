@@ -51,39 +51,41 @@ body {
   position:sticky; top:0; z-index:20;
   display:flex; align-items:center; justify-content:space-between;
 
-  height:84px;
-  padding:0 48px;
+  height:100px;
+  padding:0 65px 0 80px;
 
-  font-size:17px;
+  font-size:18px;
   font-weight:600;
 
   background:rgba(10,15,25,.72);
-  backdrop-filter: blur(22px);
-  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(24px);
+  border-bottom:1px solid rgba(255,255,255,.07);
 }
 
 .brand{
-  display:flex; gap:14px; align-items:center;
-  font-size:20px; font-weight:700;
+  display:flex; align-items:center;
+  gap:20px;
+  font-size:24px;  /* larger text */
+  font-weight:800; /* stronger than nav links */
+  letter-spacing:-0.4px;
 }
 
 .logo{
   height:114px; /* 🔥 much bigger */
   width:auto;
-  filter: drop-shadow(0 0 8px rgba(34,211,238,.35));
-  transition:transform .2s;
+  filter:drop-shadow(0 0 9px rgba(34,211,238,.42));
+  transition:transform .22s cubic-bezier(.22,.61,.36,1);
 }
 .logo:hover{
-  transform:scale(1.04);
+  transform:scale(1.05);
 }
-
 
 .nav a{
   color:var(--muted);
   text-decoration:none;
-  padding:10px 20px;
+  padding:10px 22px;
   border-radius:999px;
-  transition:.18s;
+  transition:.22s;
 }
 
 .nav a:hover{
@@ -94,7 +96,7 @@ body {
 .nav a.active{
   color:#fff;
   background:linear-gradient(90deg, var(--brand), #5b21b6);
-  box-shadow:0 0 18px rgba(37,99,235,.45);
+  box-shadow:0 0 20px rgba(37,99,235,.45);
 }
 
 /* Layout */
@@ -180,3 +182,55 @@ input:focus, select:focus{box-shadow:var(--ring); border-color:rgba(99,102,241,.
 #tickets-table tr:last-child td{border-bottom:0}
 #tickets-table tr.ok{background:rgba(16,185,129,.08)}
 #tickets-table tr.bad{background:rgba(239,68,68,.10)}
+
+/* === Dashboard Table Enhancements === */
+
+.table-wrap {
+  background: rgba(255,255,255,0.06); /* ✅ lighter background panel */
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(22px);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 45px rgba(0,0,0,.45);
+  overflow: auto;
+  margin-top: 20px;
+}
+
+/* Table */
+#tickets-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#tickets-table th,
+#tickets-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+/* Stronger header visibility */
+#tickets-table th {
+  color: #d1e5ff;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  font-weight: 700;
+  backdrop-filter: brightness(1.2);
+}
+
+/* ✅ Improved row state colors */
+#tickets-table tr.ok {
+  background: rgba(16,185,129,.20) !important; /* brighter green */
+  color: #d4ffe9;
+}
+
+#tickets-table tr.bad {
+  background: rgba(239,68,68,.18) !important; /* brighter red */
+  color: #ffe2e2;
+}
+
+/* Hover highlight for readability */
+#tickets-table tbody tr:hover {
+  filter: brightness(1.18);
+}
