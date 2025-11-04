@@ -46,7 +46,7 @@ body{
 
 /* BIG logo */
 .tvg-logo{
-  height:150px; width:auto;
+  height:165px; width:auto;
   filter:drop-shadow(0 0 14px rgba(34,211,238,.55));
   transition:.25s ease;
 }
@@ -76,7 +76,7 @@ body{
 .tvg-tab.active{
   background:linear-gradient(90deg,#22d3ee,#2563eb);
   color:#fff!important;
-  box-shadow:0 10px 26px rgba(34,211,238,.28);
+  box-shadow:0 14px 32px rgba(34,211,238,.28), 0 0 0 1px rgba(255,255,255,.06) inset;
 }
 
 /* Right-side actions */
@@ -116,12 +116,12 @@ body{
   .tvg-nav{
     flex-wrap:wrap;
     justify-content:center;
-    padding:16px 20px;
+    padding:18px 44px;
   }
   .tvg-links{
     order:3; width:100%;
     justify-content:center;
-    gap:18px;
+    gap:28px;
   }
   .tvg-logo{ height:110px; }
 }
@@ -147,6 +147,7 @@ h2{
 .card, .table-wrap{
   background:var(--panel);
   border:1px solid rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.16);
   backdrop-filter:blur(22px);
   padding:20px;
   border-radius:var(--radius);
@@ -239,4 +240,94 @@ input:focus, select:focus{
 @media(max-width:480px){
   .container{ padding:0 18px; }
   #tickets-table th,#tickets-table td{ font-size:13px; }
+}
+
+/* ===== NAV SIZE + RESPONSIVE TUNING (override) ===== */
+
+/* Default (desktop ≤ 1440px) */
+.tvg-nav{
+  padding:14px 36px;     /* was 22px 48px */
+}
+.tvg-logo{
+  height:118px;          /* was 150px */
+}
+.tvg-links{ gap:24px; }
+.tvg-tab{
+  font-size:16px;        /* was 18px */
+  padding:10px 20px;     /* was 12px 26px */
+}
+.tvg-home{ padding:10px 18px; font-size:15px; }
+.api-gear{ padding:8px 12px; font-size:18px; }
+
+/* Large tablet */
+@media (max-width: 1024px){
+  .tvg-nav{ padding:12px 24px; }
+  .tvg-logo{ height:92px; }
+  .tvg-links{ gap:18px; }
+  .tvg-tab{ font-size:15px; padding:9px 16px; }
+  .tvg-home{ padding:9px 16px; font-size:14px; }
+}
+
+/* Tablet / small laptop */
+@media (max-width: 820px){
+  .tvg-nav{
+    padding:10px 18px;
+    gap:12px;
+    flex-wrap:wrap;             /* allow wrap */
+    justify-content:space-between;
+  }
+  .tvg-logo{ height:72px; }
+  .tvg-links{
+    order:3;
+    width:100%;
+    justify-content:center;
+    gap:14px;
+    margin-top:6px;
+    flex-wrap:wrap;
+  }
+  .tvg-tab{ font-size:14px; padding:8px 14px; }
+}
+
+/* Phones */
+@media (max-width: 560px){
+  .tvg-logo{ height:58px; }
+  .tvg-links{ gap:10px; }
+  .tvg-tab{ font-size:13px; padding:8px 12px; }
+  .tvg-home{ display:none; }    /* hide Home pill on very small screens */
+  .api-gear{ font-size:17px; padding:7px 10px; }
+}
+
+/* ===== PAGE LAYOUT TUNING ===== */
+
+.container{ max-width:1100px; } /* slightly tighter than 1300 */
+
+.card, .table-wrap{ padding:16px; }   /* was 20px */
+
+.grid{ gap:12px; }  /* slightly tighter */
+
+/* Form controls: reduce height a hair */
+input,select,textarea{ padding:10px 12px; }
+
+/* Break grid earlier so forms stack */
+@media (max-width: 980px){
+  .grid{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 720px){
+  .grid{ grid-template-columns:1fr; }
+  .btn{ width:100%; }
+}
+
+/* Heading sizes down a notch on small screens */
+@media (max-width: 820px){
+  h1{ font-size:30px; }
+}
+@media (max-width: 560px){
+  h1{ font-size:26px; }
+}
+
+/* Table: slightly smaller cells on narrow widths */
+@media (max-width: 900px){
+  #tickets-table th, #tickets-table td{
+    padding:10px 12px; font-size:14px;
+  }
 }
