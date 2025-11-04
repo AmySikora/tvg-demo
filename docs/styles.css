@@ -78,9 +78,10 @@ body{
 /* Logo — larger like the website */
 .nav--tvg .nav-logo img{
   display:block;
-  height: 44px;          /* mobile / base */
+  height: 84px;          /* mobile / base */
   width:auto;
   filter: drop-shadow(0 0 8px rgba(99,102,241,.35));
+  padding-top: 19px;
 }
 @media (min-width: 920px){
   .nav--tvg .nav-logo img{ height: 56px; }  /* desktop size */
@@ -257,7 +258,7 @@ input:focus, select:focus{ box-shadow:var(--ring); border-color:rgba(99,102,241,
 @media (max-width:1024px){
   .nav{ height:92px; padding:0 40px 0 56px; font-size:17px }
   .brand{ font-size:22px }
-  .logo{ height:56px }
+  .logo{ height:48px }
   .grid{ grid-template-columns:1fr 1fr }
 }
 @media (max-width:720px){
