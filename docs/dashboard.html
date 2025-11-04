@@ -9,43 +9,25 @@
   <meta name="description" content="Live listings feed showing approved and blocked duplicate tickets." />
 </head>
 <body>
-  <header class="nav">
-    <div class="brand">
-      <a class="brand-link" href="https://ticketveriguard.com/">
-      <img src="favicon_logo.png" alt="Ticket VeriGuard" class="logo" />
-      </a>
-    </div>
-    <nav>
-      <a href="dashboard.html" class="tab active" data-tab="dash">Dashboard</a>
-      <a href="index.html" class="tab" data-tab="sim">Simulator</a>
-      <a id="back-link" class="back-link" href="https://ticketveriguard.com/">← Back to website</a>
-      <button class="api-gear" id="api-gear" aria-label="API settings">⚙️</button>
-
-<div class="api-panel" id="api-panel" hidden>
-  <h3>API Endpoint</h3>
-  <p class="muted" style="margin-top:-6px">Set where the demo sends requests.</p>
-
-  <label style="margin-top:10px">
-    <span>Current:</span>
-    <code id="api-current">(default)</code>
-  </label>
-
-  <div class="api-actions">
-    <button class="btn" data-api="http://localhost:8000">Use Local (http://localhost:8000)</button>
-    <button class="btn" data-api="https://tvg-demo.onrender.com">Use Render (https://tvg-demo.onrender.com)</button>
-    <button class="btn btn-secondary" id="api-clear">Reset to Default</button>
-  </div>
-
-  <label style="display:block; margin-top:10px">
-    <span>Custom URL</span>
-    <input id="api-custom" placeholder="https://your-api.example.com" />
-  </label>
-  <button class="btn" id="api-save" style="margin-top:10px">Save & Reload</button>
-</div>
-
+  <header class="tvg-nav">
+    <!-- Left: Logo -->
+    <a class="tvg-logo-link" href="https://ticketveriguard.com/">
+      <img src="favicon_logo.png" alt="Ticket VeriGuard" class="tvg-logo" />
+    </a>
+  
+    <!-- Center Tabs -->
+    <nav class="tvg-links">
+      <a href="index.html" class="tvg-tab" data-tab="sim">Simulator</a>
+      <a href="dashboard.html" class="tvg-tab active" data-tab="dash">Dashboard</a>
     </nav>
-  </header>
-
+  
+    <!-- Right actions -->
+    <div class="tvg-actions">
+      <a href="https://ticketveriguard.com/" class="tvg-home">← Back to Website</a>
+      <button class="api-gear" id="api-gear" aria-label="API settings">⚙️</button>
+    </div>
+  </header>  
+  
   <main class="container">
     <h1>Live Listings</h1>
     <p class="muted">Approved listings are shown in green; blocked duplicates are highlighted in red.</p>
