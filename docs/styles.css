@@ -78,7 +78,7 @@ body{
 /* Logo — larger like the website */
 .nav--tvg .nav-logo img{
   display:block;
-  height: 84px;          /* mobile / base */
+  height: 104px;          /* mobile / base */
   width:auto;
   filter: drop-shadow(0 0 8px rgba(99,102,241,.35));
   padding-top: 19px;
