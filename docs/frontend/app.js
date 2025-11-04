@@ -113,3 +113,16 @@ if (onDashboard) {
   load();
   setInterval(load, 2500);
 }
+
+// Auto-highlight current tab
+(() => {
+  const p = location.pathname.toLowerCase();
+  const sim = document.querySelector('.nav-links .tab[data-tab="sim"]');
+  const dash = document.querySelector('.nav-links .tab[data-tab="dash"]');
+  if (p.endsWith('/dashboard.html')) {
+    dash?.classList.add('active');
+  } else {
+    sim?.classList.add('active'); // default to Simulator
+  }
+})();
+
