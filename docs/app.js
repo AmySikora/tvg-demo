@@ -113,3 +113,53 @@ if (onDashboard) {
   load();
   setInterval(load, 2500);
 }
+
+// ---- API Switcher (gear) ----
+(function apiSwitcher(){
+  const gear = document.getElementById('api-gear');
+  const panel = document.getElementById('api-panel');
+  if(!gear || !panel) return;
+
+  // Read current setting
+  const cur = localStorage.getItem('tvg_api') || '(default; http://localhost:8000)';
+  const curEl = panel.querySelector('#api-current');
+  if(curEl) curEl.textContent = cur;
+
+  // Toggle panel
+  gear.addEventListener('click', () => {
+    panel.hidden = !panel.hidden;
+  });
+
+  // Predefined buttons
+  panel.querySelectorAll('.api-actions .btn[data-api]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const url = btn.getAttribute('data-api');
+      localStorage.setItem('tvg_api', url);
+      location.reload();
+    });
+  });
+
+  // Clear to default (removes override; falls back to http://localhost:8000 unless you hardcode API_BASE)
+  const clearBtn = document.getElementById('api-clear');
+  clearBtn.addEventListener('click', () => {
+    localStorage.removeItem('tvg_api');
+    location.reload();
+  });
+
+  // Save custom
+  const saveBtn = document.getElementById('api-save');
+  const custom = document.getElementById('api-custom');
+  saveBtn.addEventListener('click', () => {
+    const v = (custom.value || '').trim();
+    if(!v) return;
+    localStorage.setItem('tvg_api', v);
+    location.reload();
+  });
+
+  // Click outside to close
+  document.addEventListener('click', (e) => {
+    if(panel.hidden) return;
+    if(e.target === gear || panel.contains(e.target)) return;
+    panel.hidden = true;
+  });
+})();

@@ -19,6 +19,30 @@
     <nav>
       <a href="index.html">Simulator</a>
       <a href="dashboard.html" class="active">Dashboard</a>
+      <button class="api-gear" id="api-gear" aria-label="API settings">⚙️</button>
+
+<div class="api-panel" id="api-panel" hidden>
+  <h3>API Endpoint</h3>
+  <p class="muted" style="margin-top:-6px">Set where the demo sends requests.</p>
+
+  <label style="margin-top:10px">
+    <span>Current:</span>
+    <code id="api-current">(default)</code>
+  </label>
+
+  <div class="api-actions">
+    <button class="btn" data-api="http://localhost:8000">Use Local (http://localhost:8000)</button>
+    <button class="btn" data-api="https://tvg-demo.onrender.com">Use Render (https://tvg-demo.onrender.com)</button>
+    <button class="btn btn-secondary" id="api-clear">Reset to Default</button>
+  </div>
+
+  <label style="display:block; margin-top:10px">
+    <span>Custom URL</span>
+    <input id="api-custom" placeholder="https://your-api.example.com" />
+  </label>
+  <button class="btn" id="api-save" style="margin-top:10px">Save & Reload</button>
+</div>
+
     </nav>
   </header>
 
