@@ -4,7 +4,7 @@ const RENDER_URL = "https://tvg-demo.onrender.com";
 function getApiBase() {
   const override = localStorage.getItem("tvg_api");
   if (override && override.trim()) return override.trim();
-  return RENDER_URL; // default is your Render API
+  return RENDER_URL; // default hosted API
 }
 
 function setApiBase(url) {
@@ -22,7 +22,6 @@ async function fetchJSON(path, options = {}, { allowFailover = true } = {}) {
     clearTimeout(t);
 
     if (!res.ok) {
-      // Surface FastAPI error details when possible
       let detail = `HTTP ${res.status}`;
       const text = await res.text();
       try {
@@ -36,10 +35,8 @@ async function fetchJSON(path, options = {}, { allowFailover = true } = {}) {
       err.body = text;
       throw err;
     }
-
     return res.json();
   } catch (err) {
-    // If dev/local failed, try the hosted API once and persist it
     if (allowFailover && base.startsWith("http://localhost")) {
       try {
         const ctrl = new AbortController();
@@ -69,8 +66,6 @@ async function fetchJSON(path, options = {}, { allowFailover = true } = {}) {
         throw fallbackErr;
       }
     }
-
-    // Re-throw original error so UI can display it
     throw err;
   }
 }
@@ -79,7 +74,6 @@ async function fetchJSON(path, options = {}, { allowFailover = true } = {}) {
 export async function fetchEvents() {
   return fetchJSON("/events");
 }
-
 export async function listTicket(payload) {
   return fetchJSON("/marketplace/list", {
     method: "POST",
@@ -87,15 +81,13 @@ export async function listTicket(payload) {
     body: JSON.stringify(payload),
   });
 }
-
 export async function fetchTickets() {
   return fetchJSON("/tickets");
 }
-
 export async function bulkList(payload) {
   return fetchJSON("/marketplace/bulk_list", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload), // seats come as strings from app.js
+    body: JSON.stringify(payload), // seats sent as strings from app.js
   });
 }

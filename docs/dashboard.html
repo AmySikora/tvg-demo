@@ -10,39 +10,113 @@
 </head>
 <body>
   <header class="tvg-nav">
-    <!-- Left: Logo -->
     <a class="tvg-logo-link" href="https://ticketveriguard.com/">
       <img src="favicon_logo.png" alt="Ticket VeriGuard" class="tvg-logo" />
     </a>
-  
-    <!-- Center Tabs -->
     <nav class="tvg-links">
       <a href="index.html" class="tvg-tab" data-tab="sim">Simulator</a>
       <a href="dashboard.html" class="tvg-tab active" data-tab="dash">Dashboard</a>
     </nav>
-  
-    <!-- Right actions -->
     <div class="tvg-actions">
       <a href="https://ticketveriguard.com/" class="tvg-home">← Back to Website</a>
     </div>
-  </header>  
-  
+  </header>
+
   <main class="container">
     <h1>Live Listings</h1>
     <p class="muted">Approved listings are shown in green; blocked duplicates are highlighted in red.</p>
+
+    <!-- Filter bar with autocomplete, scope & pinning -->
+    <section class="card" style="margin-bottom:14px;">
+      <div class="grid">
+        <label>
+          <span>Decision</span>
+          <select id="f-decision">
+            <option value="">All</option>
+            <option value="APPROVED">Approved</option>
+            <option value="BLOCKED_DUPLICATE">Blocked</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Marketplace</span>
+          <input id="f-marketplace" list="list-marketplaces" placeholder="Type or pick…" />
+          <datalist id="list-marketplaces"></datalist>
+        </label>
+
+        <label>
+          <span>Event</span>
+          <input id="f-event" list="list-events" placeholder="Type or pick…" />
+          <datalist id="list-events"></datalist>
+        </label>
+
+        <label>
+          <span>Section</span>
+          <input id="f-section" list="list-sections" placeholder="e.g., 145" />
+          <datalist id="list-sections"></datalist>
+        </label>
+
+        <label>
+          <span>Row</span>
+          <input id="f-row" list="list-rows" placeholder="e.g., F or 0" />
+          <datalist id="list-rows"></datalist>
+        </label>
+
+        <label>
+          <span>Seat</span>
+          <input id="f-seat" placeholder="e.g., 12" />
+        </label>
+
+        <label>
+          <span>Limit</span>
+          <select id="f-limit">
+            <option>50</option>
+            <option selected>200</option>
+            <option>500</option>
+            <option>1000</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Auto-refresh</span>
+          <select id="f-autorefresh">
+            <option value="2500">Every 2.5s</option>
+            <option value="5000" selected>Every 5s</option>
+            <option value="0">Paused</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Scope</span>
+          <select id="f-scope">
+            <option value="all" selected>All listings</option>
+            <option value="mine-session">Mine (session)</option>
+            <option value="mine-local">Mine (local IDs)</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Pin matches first</span>
+          <select id="f-pin">
+            <option value="0" selected>No</option>
+            <option value="1">Yes</option>
+          </select>
+        </label>
+      </div>
+    </section>
 
     <div class="table-wrap">
       <table id="tickets-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Decision</th>
-            <th>Marketplace</th>
-            <th>Event</th>
-            <th>Section</th>
-            <th>Row</th>
-            <th>Seat</th>
-            <th>When</th>
+            <th data-sort="id">ID</th>
+            <th data-sort="decision">Decision</th>
+            <th data-sort="marketplace">Marketplace</th>
+            <th data-sort="event_id">Event</th>
+            <th data-sort="section">Section</th>
+            <th data-sort="row">Row</th>
+            <th data-sort="seat">Seat</th>
+            <th data-sort="created_at">When</th>
           </tr>
         </thead>
         <tbody></tbody>
