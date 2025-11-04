@@ -1,30 +1,61 @@
+// app.js
 import { fetchEvents, listTicket, fetchTickets, bulkList } from './api.js';
 
-const onSimulator = document.getElementById('list-form');
-const onDashboard = document.getElementById('tickets-table');
+/* -------------------------------
+   API base: default + override
+--------------------------------*/
+const IS_DEV = ['localhost', '127.0.0.1'].includes(location.hostname);
+const DEFAULT_API = IS_DEV
+  ? 'http://localhost:8000'
+  : 'https://tvg-demo.onrender.com';
 
-// ----- Simulator -----
+// If the user hasn't chosen anything yet, set a default so it just works.
+if (!localStorage.getItem('tvg_api')) {
+  localStorage.setItem('tvg_api', DEFAULT_API);
+}
+
+/* --------------------------------
+   Helpers for nicer error fallback
+---------------------------------*/
+function populateEventsSelect(selectEl, events) {
+  selectEl.innerHTML = '';
+  events.forEach(e => {
+    const o = document.createElement('option');
+    o.value = e.event_id;
+    o.textContent = `${e.name} — ${new Date(e.date).toLocaleString()}`;
+    selectEl.appendChild(o);
+  });
+}
+
+function showEventsError(selectEl, err) {
+  console.error('Failed to load events:', err);
+  selectEl.innerHTML = '';
+  const o = document.createElement('option');
+  o.textContent = 'Could not load events';
+  o.value = '';
+  selectEl.appendChild(o);
+}
+
+/* -----------------
+   Simulator
+------------------*/
+const onSimulator = document.getElementById('list-form');
 if (onSimulator) {
   const sel = document.getElementById('event-select');
-  fetchEvents().then(events => {
-    sel.innerHTML = '';
-    events.forEach(e => {
-      const o = document.createElement('option');
-      o.value = e.event_id;
-      o.textContent = `${e.name} — ${new Date(e.date).toLocaleString()}`;
-      sel.appendChild(o);
-    });
-  });
+
+  fetchEvents()
+    .then(events => populateEventsSelect(sel, events))
+    .catch(err => showEventsError(sel, err));
 
   onSimulator.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(onSimulator);
     const payload = Object.fromEntries(fd.entries());
-    try{
+    try {
       const res = await listTicket(payload);
       showResult(res);
       onSimulator.reset();
-    }catch(err){
+    } catch (err) {
       showError(err.message);
     }
   });
@@ -43,19 +74,16 @@ if (onSimulator) {
   }
 }
 
-// ----- Bulk form -----
+/* --------------
+   Bulk form
+---------------*/
 const bulkForm = document.getElementById('bulk-form');
 if (bulkForm) {
   const sel = document.getElementById('bulk-event');
-  fetchEvents().then(events => {
-    sel.innerHTML = '';
-    events.forEach(e => {
-      const o = document.createElement('option');
-      o.value = e.event_id;
-      o.textContent = `${e.name} — ${new Date(e.date).toLocaleString()}`;
-      sel.appendChild(o);
-    });
-  });
+
+  fetchEvents()
+    .then(events => populateEventsSelect(sel, events))
+    .catch(err => showEventsError(sel, err));
 
   bulkForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -83,7 +111,10 @@ if (bulkForm) {
   });
 }
 
-// ----- Dashboard -----
+/* ----------------
+   Dashboard
+-----------------*/
+const onDashboard = document.getElementById('tickets-table');
 if (onDashboard) {
   async function load(){
     const rows = await fetchTickets();
@@ -114,21 +145,22 @@ if (onDashboard) {
   setInterval(load, 2500);
 }
 
-// ---- API Switcher (gear) ----
+/* --------------------------
+   API Switcher (gear)
+---------------------------*/
 (function apiSwitcher(){
   const gear = document.getElementById('api-gear');
   const panel = document.getElementById('api-panel');
   if(!gear || !panel) return;
 
-  // Read current setting
-  const cur = localStorage.getItem('tvg_api') || '(default; http://localhost:8000)';
+  const effective = localStorage.getItem('tvg_api') || DEFAULT_API;
+
+  // Show current/effective API
   const curEl = panel.querySelector('#api-current');
-  if(curEl) curEl.textContent = cur;
+  if (curEl) curEl.textContent = effective;
 
   // Toggle panel
-  gear.addEventListener('click', () => {
-    panel.hidden = !panel.hidden;
-  });
+  gear.addEventListener('click', () => { panel.hidden = !panel.hidden; });
 
   // Predefined buttons
   panel.querySelectorAll('.api-actions .btn[data-api]').forEach(btn => {
@@ -139,22 +171,27 @@ if (onDashboard) {
     });
   });
 
-  // Clear to default (removes override; falls back to http://localhost:8000 unless you hardcode API_BASE)
+  // Clear to default
   const clearBtn = document.getElementById('api-clear');
-  clearBtn.addEventListener('click', () => {
-    localStorage.removeItem('tvg_api');
-    location.reload();
-  });
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      localStorage.removeItem('tvg_api');
+      // On reload, the DEFAULT_API will be written again at top.
+      location.reload();
+    });
+  }
 
   // Save custom
   const saveBtn = document.getElementById('api-save');
   const custom = document.getElementById('api-custom');
-  saveBtn.addEventListener('click', () => {
-    const v = (custom.value || '').trim();
-    if(!v) return;
-    localStorage.setItem('tvg_api', v);
-    location.reload();
-  });
+  if (saveBtn && custom) {
+    saveBtn.addEventListener('click', () => {
+      const v = (custom.value || '').trim();
+      if(!v) return;
+      localStorage.setItem('tvg_api', v);
+      location.reload();
+    });
+  }
 
   // Click outside to close
   document.addEventListener('click', (e) => {
