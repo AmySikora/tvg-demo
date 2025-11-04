@@ -26,84 +26,82 @@
     <h1>Live Listings</h1>
     <p class="muted">Approved listings are shown in green; blocked duplicates are highlighted in red.</p>
 
-    <!-- Filter bar with autocomplete, scope & pinning -->
-    <!-- Filter bar (simple + stable) -->
-<section class="card" style="margin-bottom:14px;">
-  <div class="grid">
-    <label>
-      <span>Decision</span>
-      <select id="f-decision">
-        <option value="">All</option>
-        <option value="APPROVED">Approved</option>
-        <option value="BLOCKED_DUPLICATE">Blocked</option>
-      </select>
-    </label>
+    <!-- Simple filters (native selects) -->
+    <section class="card" style="margin-bottom:14px;">
+      <div class="grid">
+        <label>
+          <span>Decision</span>
+          <select id="f-decision">
+            <option value="">All</option>
+            <option value="APPROVED">Approved</option>
+            <option value="BLOCKED_DUPLICATE">Blocked</option>
+          </select>
+        </label>
 
-    <label>
-      <span>Marketplace</span>
-      <select id="f-marketplace">
-        <option value="">All</option>
-        <!-- options filled dynamically -->
-      </select>
-    </label>
+        <label>
+          <span>Marketplace</span>
+          <select id="f-marketplace">
+            <option value="">All</option>
+            <!-- options filled dynamically -->
+          </select>
+        </label>
 
-    <label>
-      <span>Event</span>
-      <select id="f-event">
-        <option value="">All</option>
-        <!-- options filled dynamically -->
-      </select>
-    </label>
+        <label>
+          <span>Event</span>
+          <select id="f-event">
+            <option value="">All</option>
+            <!-- options filled dynamically -->
+          </select>
+        </label>
 
-    <label>
-      <span>Section</span>
-      <input id="f-section" placeholder="e.g., 145" />
-    </label>
+        <label>
+          <span>Section</span>
+          <input id="f-section" placeholder="e.g., 145" />
+        </label>
 
-    <label>
-      <span>Row</span>
-      <input id="f-row" placeholder="e.g., F or 0" />
-    </label>
+        <label>
+          <span>Row</span>
+          <input id="f-row" placeholder="e.g., F or 0" />
+        </label>
 
-    <label>
-      <span>Seat</span>
-      <input id="f-seat" placeholder="e.g., 12" />
-    </label>
+        <label>
+          <span>Seat</span>
+          <input id="f-seat" placeholder="e.g., 12" />
+        </label>
 
-    <label>
-      <span>Limit</span>
-      <select id="f-limit">
-        <option>50</option>
-        <option selected>200</option>
-        <option>500</option>
-        <option>1000</option>
-      </select>
-    </label>
+        <label>
+          <span>Limit</span>
+          <select id="f-limit">
+            <option>50</option>
+            <option selected>200</option>
+            <option>500</option>
+            <option>1000</option>
+          </select>
+        </label>
 
-    <label>
-      <span>Auto-refresh</span>
-      <select id="f-autorefresh">
-        <option value="2500">Every 2.5s</option>
-        <option value="5000" selected>Every 5s</option>
-        <option value="0">Paused</option>
-      </select>
-    </label>
+        <label>
+          <span>Auto-refresh</span>
+          <select id="f-autorefresh">
+            <option value="2500">Every 2.5s</option>
+            <option value="5000" selected>Every 5s</option>
+            <option value="0">Paused</option>
+          </select>
+        </label>
 
-    <label>
-      <span>Scope</span>
-      <select id="f-scope">
-        <option value="all" selected>All</option>
-        <option value="mine-session">Mine</option>
-      </select>
-    </label>
+        <label>
+          <span>Scope</span>
+          <select id="f-scope">
+            <option value="all" selected>All</option>
+            <option value="mine">Mine</option>
+          </select>
+        </label>
 
-    <div>
-      <span style="display:inline-block;height:24px"></span>
-      <button id="f-reset" class="btn" type="button">Reset</button>
-    </div>
-  </div>
-</section>
-
+        <div>
+          <span style="display:inline-block;height:24px"></span>
+          <button id="f-reset" class="btn" type="button">Reset</button>
+        </div>
+      </div>
+    </section>
 
     <div class="table-wrap">
       <table id="tickets-table">

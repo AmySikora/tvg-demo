@@ -20,6 +20,7 @@ function uuid4() {
 const TVG_SESSION = localStorage.getItem("tvg_session") || uuid4();
 localStorage.setItem("tvg_session", TVG_SESSION);
 
+// Track my created row IDs (if API returns them)
 function getMyIds() {
   try { return new Set(JSON.parse(localStorage.getItem("tvg_my_ids") || "[]")); }
   catch { return new Set(); }
@@ -28,6 +29,27 @@ function addMyIds(ids) {
   const s = getMyIds();
   ids.forEach(id => id && s.add(id));
   localStorage.setItem("tvg_my_ids", JSON.stringify(Array.from(s)));
+}
+
+// ----- Seat "signature" helpers so Mine works even without ids/session -----
+function rowKeyNorm(v) { return String(v ?? "").toUpperCase().replace(/O/g, "0"); }
+function ticketSig({ marketplace, event_id, section, row, seat }) {
+  return [
+    String(marketplace || ""),
+    String(event_id || ""),
+    String(section || ""),
+    rowKeyNorm(row || ""),
+    String(seat || "")
+  ].join("|");
+}
+function getMySigs() {
+  try { return new Set(JSON.parse(localStorage.getItem("tvg_my_sigs") || "[]")); }
+  catch { return new Set(); }
+}
+function addMySigs(sigs) {
+  const s = getMySigs();
+  sigs.forEach(sig => sig && s.add(sig));
+  localStorage.setItem("tvg_my_sigs", JSON.stringify(Array.from(s)));
 }
 
 /* --------------------------------
@@ -205,7 +227,19 @@ if (simForm) {
             ${ok ? `&nbsp;&nbsp;<a href="dashboard.html" style="text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:6px 10px;border-radius:10px;margin-left:8px;color:#eaf2ff;">View on Dashboard →</a>` : ""}
           </div>`;
         if (res?.id) addMyIds([res.id]);
-        setTimeout(() => { if (!userTouchedSeats) resultEl.innerHTML = ""; }, SUCCESS_CLEAR_MS);
+
+        // Save signatures for Mine fallback
+        addMySigs([
+          ticketSig({
+            marketplace: basePayload.marketplace,
+            event_id: basePayload.event_id,
+            section: basePayload.section,
+            row: basePayload.row,
+            seat: String(seats[0])
+          })
+        ]);
+
+        setTimeout(() => { if (!userTouchedSeats) resultEl.innerHTML = ""; }, 2800);
       } else {
         const res = await bulkList({ ...basePayload, seats: seats.map(String) });
         const okCount = res.results.filter((r) => r.decision === "APPROVED").length;
@@ -216,7 +250,19 @@ if (simForm) {
             ${badCount === 0 ? `&nbsp;&nbsp;<a href="dashboard.html" style="text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:6px 10px;border-radius:10px;margin-left:8px;color:#eaf2ff;">View on Dashboard →</a>` : ""}
           </div>`;
         if (Array.isArray(res?.results)) addMyIds(res.results.map(r => r.id).filter(Boolean));
-        setTimeout(() => { if (!userTouchedSeats) resultEl.innerHTML = ""; }, SUCCESS_CLEAR_MS);
+
+        // Save signatures for Mine fallback
+        addMySigs(
+          seats.map(seat => ticketSig({
+            marketplace: basePayload.marketplace,
+            event_id: basePayload.event_id,
+            section: basePayload.section,
+            row: basePayload.row,
+            seat: String(seat)
+          }))
+        );
+
+        setTimeout(() => { if (!userTouchedSeats) resultEl.innerHTML = ""; }, 2800);
       }
 
       simForm.reset();
@@ -234,7 +280,7 @@ if (simForm) {
 }
 
 /* ----------------
-   Dashboard (simple selects + scope)
+   Dashboard (simple selects + scope with robust "Mine")
 -----------------*/
 const onDashboard = document.getElementById("tickets-table");
 if (onDashboard) {
@@ -261,70 +307,70 @@ if (onDashboard) {
     if (ms > 0) timer = setInterval(load, ms);
   }
 
-  function normalizeRowKey(v) {
-    return String(v || "").toUpperCase().replace(/O/g, "0");
-  }
+  // Build select options only when changed (prevents Firefox jumpiness)
+  function setOptionsIfChanged(selectEl, values) {
+    const uniq = Array.from(new Set(values.filter(Boolean))).sort((a,b)=>String(a).localeCompare(String(b)));
+    const currentSnapshot = Array.from(selectEl.options).map(o => o.value).join("|");
+    const nextSnapshot = ["", ...uniq].join("|");
+    if (currentSnapshot === nextSnapshot) return;
 
-  function populateSelect(selectEl, values) {
-    const current = selectEl.value;
-    selectEl.innerHTML = '<option value="">All</option>' +
-      Array.from(new Set(values.filter(Boolean)))
-        .sort((a, b) => String(a).localeCompare(String(b)))
-        .map(v => `<option value="${String(v)}">${String(v)}</option>`)
-        .join("");
-    // restore selection if still present
-    if ([...selectEl.options].some(o => o.value === current)) {
-      selectEl.value = current;
+    const currentValue = selectEl.value;
+    selectEl.innerHTML = '<option value="">All</option>' + uniq.map(v => `<option value="${String(v)}">${String(v)}</option>`).join("");
+    if ([...selectEl.options].some(o => o.value === currentValue)) {
+      selectEl.value = currentValue;
     }
   }
 
   function populateFiltersFromData(rows) {
-    populateSelect(marketplaceEl, rows.map(r => r.marketplace));
-    populateSelect(eventEl,       rows.map(r => r.event_id));
+    const knownMarkets = ["StubHub", "Marketplace A"];
+    setOptionsIfChanged(marketplaceEl, [...knownMarkets, ...rows.map(r => r.marketplace)]);
+    setOptionsIfChanged(eventEl, rows.map(r => r.event_id));
   }
 
   function matches(row) {
-    // Scope: "All" or "Mine"
-    // "Mine" works in BOTH cases:
-    //   A) Server includes client_session on each row, OR
-    //   B) We saved the row IDs locally when you submitted (my IDs).
+    // ---- Scope: All or Mine (robust) ----
     if (scopeEl.value === "mine") {
-      const hasServerSession = !!row.client_session;
-      if (hasServerSession) {
+      if (row.client_session) {
         if (row.client_session !== TVG_SESSION) return false;
       } else {
-        const mine = getMyIds();        // from top of app.js
-        if (!mine.has(row.id)) return false;
+        const mineIds = getMyIds();
+        if (row.id && mineIds.has(row.id)) {
+          // ok
+        } else {
+          const sig = ticketSig({
+            marketplace: row.marketplace,
+            event_id: row.event_id,
+            section: row.section,
+            row: row.row,
+            seat: row.seat
+          });
+          const mineSigs = getMySigs();
+          if (!mineSigs.has(sig)) return false;
+        }
       }
     }
-  
-    // Decision exact
+
+    // ---- Other filters ----
     const d = (decisionEl.value || "").trim();
     if (d && row.decision !== d) return false;
-  
-    // Marketplace exact (native <select>)
+
     const m = (marketplaceEl.value || "").trim();
     if (m && row.marketplace !== m) return false;
-  
-    // Event exact (native <select>)
+
     const e = (eventEl.value || "").trim();
     if (e && row.event_id !== e) return false;
-  
-    // Section typed
+
     const s = (sectionEl.value || "").trim();
     if (s && String(row.section || "") !== s) return false;
-  
-    // Row typed with O/0 normalization
-    const r = normalizeRowKey((rowEl.value || "").trim());
-    if (r && normalizeRowKey(row.row) !== r) return false;
-  
-    // Seat typed
+
+    const r = rowKeyNorm((rowEl.value || "").trim());
+    if (r && rowKeyNorm(row.row) !== r) return false;
+
     const seat = (seatEl.value || "").trim();
     if (seat && String(row.seat || "") !== seat) return false;
-  
+
     return true;
   }
-  
 
   function draw() {
     const lim = parseInt(limitEl.value, 10) || 200;
@@ -382,17 +428,13 @@ if (onDashboard) {
     }
   }
 
-  // Sorting by clicking header
+  // Sorting
   document.querySelectorAll("#tickets-table thead th[data-sort]").forEach((th) => {
     th.style.cursor = "pointer";
     th.addEventListener("click", () => {
       const key = th.getAttribute("data-sort");
-      if (sortKey === key) {
-        sortDir = sortDir === "asc" ? "desc" : "asc";
-      } else {
-        sortKey = key;
-        sortDir = key === "created_at" ? "desc" : "asc";
-      }
+      if (sortKey === key) sortDir = sortDir === "asc" ? "desc" : "asc";
+      else { sortKey = key; sortDir = key === "created_at" ? "desc" : "asc"; }
       draw();
     });
   });
@@ -404,7 +446,7 @@ if (onDashboard) {
     .forEach(el => el.addEventListener("change", draw));
   refreshEl.addEventListener("change", setTimer);
 
-  // Reset button
+  // Reset
   resetBtn.addEventListener("click", () => {
     decisionEl.value = "";
     marketplaceEl.value = "";
@@ -420,7 +462,6 @@ if (onDashboard) {
   await load();
   setTimer();
 }
-
 
 /* --------------------------
    API Switcher (gear)

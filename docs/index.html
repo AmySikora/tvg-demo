@@ -9,34 +9,26 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- ===== Nav ===== -->
+  <!-- Nav -->
   <header class="tvg-nav">
-    <!-- Left: Logo -->
     <a class="tvg-logo-link" href="https://ticketveriguard.com/">
       <img src="favicon_logo.png" alt="Ticket VeriGuard" class="tvg-logo" />
     </a>
-
-    <!-- Center Tabs -->
     <nav class="tvg-links">
       <a href="index.html" class="tvg-tab active" data-tab="sim">Simulator</a>
       <a href="dashboard.html" class="tvg-tab" data-tab="dash">Dashboard</a>
     </nav>
-
-    <!-- Right actions -->
     <div class="tvg-actions">
       <button id="api-gear" class="api-gear" title="API settings">⚙︎</button>
       <a href="https://ticketveriguard.com/" class="tvg-home">← Back to Website</a>
     </div>
   </header>
 
-  <!-- ===== Tiny API switcher panel (works with app.js) ===== -->
+  <!-- API switcher panel -->
   <section id="api-panel" class="card" hidden style="position:fixed; right:20px; top:84px; width:420px; z-index:60;">
     <h2 style="margin-bottom:8px;">API Endpoint</h2>
-    <p class="muted" style="margin-top:0;">
-      Current: <strong id="api-current">—</strong>
-    </p>
+    <p class="muted" style="margin-top:0;">Current: <strong id="api-current">—</strong></p>
     <div class="api-actions" style="display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 6px;">
-      <!-- Buttons below simply set localStorage("tvg_api") and reload -->
       <button class="btn" data-api="https://tvg-demo.onrender.com">Use Render</button>
       <button class="btn" data-api="http://localhost:8000">Use Localhost</button>
     </div>
@@ -54,7 +46,7 @@
       We’ll normalize, dedupe, and sort automatically.
     </p>
 
-    <!-- ===== Unified Simulator Form (IDs match app.js) ===== -->
+    <!-- Unified Simulator Form -->
     <form id="sim-form" class="card" autocomplete="off">
       <div class="grid">
         <label>
@@ -87,18 +79,15 @@
         </label>
       </div>
 
-      <!-- Live hints / dedupe / warnings -->
       <div id="chips" style="margin:10px 0 6px;"></div>
       <p class="muted" style="margin-top:6px;">Mixed formats are okay. We’ll validate before submit.</p>
 
-      <!-- Preview -->
       <section class="card" style="margin-top:12px;">
         <h2>Preview</h2>
         <p style="margin:.25rem 0 0;">Total seats: <strong id="count">--</strong></p>
         <p class="muted" style="margin:.25rem 0 0;">Normalized seats: <span id="normalized">--</span></p>
       </section>
 
-      <!-- Result & Submit -->
       <div id="result" class="result" aria-live="polite" style="margin:12px 0;"></div>
       <button id="submitBtn" type="submit" class="btn">Submit Listing</button>
     </form>
