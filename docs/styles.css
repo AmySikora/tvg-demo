@@ -84,7 +84,7 @@ body{
   padding-top: 19px;
 }
 @media (min-width: 920px){
-  .nav--tvg .nav-logo img{ height: 56px; }  /* desktop size */
+  .nav--tvg .nav-logo img{ height: 86px; }  /* desktop size */
 }
 
 /* Center tabs */
@@ -258,7 +258,7 @@ input:focus, select:focus{ box-shadow:var(--ring); border-color:rgba(99,102,241,
 @media (max-width:1024px){
   .nav{ height:92px; padding:0 40px 0 56px; font-size:17px }
   .brand{ font-size:22px }
-  .logo{ height:48px }
+  .logo{ height:68px }
   .grid{ grid-template-columns:1fr 1fr }
 }
 @media (max-width:720px){
