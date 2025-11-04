@@ -12,7 +12,7 @@ function setApiBase(url) {
 }
 
 async function fetchJSON(path, options = {}, { allowFailover = true } = {}) {
-  let base = getApiBase();
+  const base = getApiBase();
   const url = `${base}${path}`;
 
   try {
@@ -21,36 +21,61 @@ async function fetchJSON(path, options = {}, { allowFailover = true } = {}) {
     const res = await fetch(url, { ...options, signal: ctrl.signal });
     clearTimeout(t);
 
-    // If server reachable but CORS blocked (rare with your FastAPI *), throw to allow failover.
     if (!res.ok) {
-      let detail = "Request failed";
+      // Surface FastAPI error details when possible
+      let detail = `HTTP ${res.status}`;
+      const text = await res.text();
       try {
-        const j = await res.json();
-        detail = j.detail || detail;
-      } catch {}
-      throw new Error(detail);
+        const j = JSON.parse(text);
+        detail = j.detail || j.message || detail;
+      } catch {
+        if (text) detail = `${detail} — ${text}`;
+      }
+      const err = new Error(detail);
+      err.status = res.status;
+      err.body = text;
+      throw err;
     }
+
     return res.json();
   } catch (err) {
-    // If we were pointing at localhost and it failed (offline/CORS/etc),
-    // fail over to Render once and persist it so next loads work.
+    // If dev/local failed, try the hosted API once and persist it
     if (allowFailover && base.startsWith("http://localhost")) {
       try {
         const ctrl = new AbortController();
         const t = setTimeout(() => ctrl.abort(), 6000);
         const res = await fetch(`${RENDER_URL}${path}`, { ...options, signal: ctrl.signal });
         clearTimeout(t);
-        if (!res.ok) throw new Error("Fallback failed");
-        // Lock in the working base for future loads
+
+        if (!res.ok) {
+          let detail = `HTTP ${res.status}`;
+          const text = await res.text();
+          try {
+            const j = JSON.parse(text);
+            detail = j.detail || j.message || detail;
+          } catch {
+            if (text) detail = `${detail} — ${text}`;
+          }
+          const err2 = new Error(detail);
+          err2.status = res.status;
+          err2.body = text;
+          throw err2;
+        }
+
         setApiBase(RENDER_URL);
         console.info("[API] Fell back to Render and saved it:", RENDER_URL);
         return res.json();
-      } catch {}
+      } catch (fallbackErr) {
+        throw fallbackErr;
+      }
     }
-    throw new Error("Network error. Please try again.");
+
+    // Re-throw original error so UI can display it
+    throw err;
   }
 }
 
+/* --------- Public API --------- */
 export async function fetchEvents() {
   return fetchJSON("/events");
 }
@@ -59,7 +84,7 @@ export async function listTicket(payload) {
   return fetchJSON("/marketplace/list", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 }
 
@@ -71,6 +96,6 @@ export async function bulkList(payload) {
   return fetchJSON("/marketplace/bulk_list", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload), // seats come as strings from app.js
   });
 }

@@ -10,18 +10,15 @@
 </head>
 <body>
   <header class="tvg-nav">
-    <!-- Left: Logo -->
     <a class="tvg-logo-link" href="https://ticketveriguard.com/">
       <img src="favicon_logo.png" alt="Ticket VeriGuard" class="tvg-logo" />
     </a>
-  
-    <!-- Center Tabs -->
+
     <nav class="tvg-links">
       <a href="index.html" class="tvg-tab active" data-tab="sim">Simulator</a>
       <a href="dashboard.html" class="tvg-tab" data-tab="dash">Dashboard</a>
     </nav>
-  
-    <!-- Right actions -->
+
     <div class="tvg-actions">
       <a href="https://ticketveriguard.com/" class="tvg-home">← Back to Website</a>
     </div>
@@ -30,16 +27,16 @@
   <main class="container">
     <h1>Marketplace Simulator</h1>
     <p class="muted">
-      Simulate a ticket listing from a marketplace. If the same seat is already listed on another
-      marketplace, we’ll automatically block the duplicate.
+      Enter a single seat <em>or</em> many. We accept commas, spaces, and ranges (e.g., <code>1-5</code> or
+      <code>1-3, 7 9</code>). We’ll normalize, dedupe, and sort automatically.
     </p>
 
-    <!-- Single Listing Form -->
-    <form id="list-form" class="card">
+    <!-- Unified Listing Form -->
+    <form id="sim-form" class="card" autocomplete="off">
       <div class="grid">
         <label>
           <span>Marketplace</span>
-          <select name="marketplace" required>
+          <select name="marketplace" id="marketplace" required>
             <option>StubHub</option>
             <option>Marketplace A</option>
           </select>
@@ -52,65 +49,35 @@
 
         <label>
           <span>Section</span>
-          <input name="section" placeholder="e.g., 135" required />
+          <input name="section" id="section" placeholder="e.g., 135" required />
         </label>
 
         <label>
           <span>Row (optional)</span>
-          <input name="row" placeholder="e.g., J" />
+          <input name="row" id="row" placeholder="e.g., J" />
         </label>
 
-        <label>
-          <span>Seat</span>
-          <input name="seat" placeholder="e.g., 12" required />
+        <label style="grid-column:1/-1">
+          <span>Seat(s)</span>
+          <input name="seats_raw" id="seats" placeholder="Examples: 12 • 10,11,12 • 1-5 • 1-3, 7 9" required />
+          <small class="muted">Mixed formats are okay. We’ll validate before submit.</small>
         </label>
       </div>
 
-      <button type="submit" class="btn">Submit Listing</button>
-    </form>
+      <div id="chips" class="muted" aria-live="polite" style="margin:8px 0;"></div>
 
-    <!-- Bulk Listing Form -->
-    <section class="card" id="bulk-card">
-      <h2>Bulk Listing (comma-separated seats)</h2>
-
-      <form id="bulk-form">
-        <div class="grid">
-          <label>
-            <span>Marketplace</span>
-            <select name="marketplace" required>
-              <option>StubHub</option>
-              <option>Marketplace A</option>
-            </select>
-          </label>
-
-          <label>
-            <span>Event</span>
-            <select name="event_id" required id="bulk-event"></select>
-          </label>
-
-          <label>
-            <span>Section</span>
-            <input name="section" placeholder="e.g., GA" required />
-          </label>
-
-          <label>
-            <span>Row (optional)</span>
-            <input name="row" placeholder="e.g., Front" />
-          </label>
-
-          <label>
-            <span>Seats (comma separated)</span>
-            <input name="seats" placeholder="e.g., 10, 11, 12" required />
-          </label>
+      <section class="card" style="margin-top:12px;">
+        <h2 style="margin-bottom:8px;">Preview</h2>
+        <div class="muted">
+          <strong>Total seats:</strong> <span id="count">0</span><br/>
+          <strong>Individual seats:</strong> <span id="normalized">—</span>
         </div>
+      </section>
 
-        <button type="submit" class="btn">Submit Bulk</button>
-      </form>
+      <div id="result" class="result" aria-live="polite" style="margin-top:8px;"></div>
 
-      <div id="bulk-result" class="result" aria-live="polite"></div>
-    </section>
-
-    <div id="result" class="result" aria-live="polite"></div>
+      <button type="submit" class="btn" id="submitBtn" disabled>Submit Listing</button>
+    </form>
   </main>
 
   <script type="module" src="app.js"></script>
