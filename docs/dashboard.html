@@ -27,83 +27,83 @@
     <p class="muted">Approved listings are shown in green; blocked duplicates are highlighted in red.</p>
 
     <!-- Filter bar with autocomplete, scope & pinning -->
-    <section class="card" style="margin-bottom:14px;">
-      <div class="grid">
-        <label>
-          <span>Decision</span>
-          <select id="f-decision">
-            <option value="">All</option>
-            <option value="APPROVED">Approved</option>
-            <option value="BLOCKED_DUPLICATE">Blocked</option>
-          </select>
-        </label>
+    <!-- Filter bar (simple + stable) -->
+<section class="card" style="margin-bottom:14px;">
+  <div class="grid">
+    <label>
+      <span>Decision</span>
+      <select id="f-decision">
+        <option value="">All</option>
+        <option value="APPROVED">Approved</option>
+        <option value="BLOCKED_DUPLICATE">Blocked</option>
+      </select>
+    </label>
 
-        <label>
-          <span>Marketplace</span>
-          <input id="f-marketplace" list="list-marketplaces" placeholder="Type or pick…" />
-          <datalist id="list-marketplaces"></datalist>
-        </label>
+    <label>
+      <span>Marketplace</span>
+      <select id="f-marketplace">
+        <option value="">All</option>
+        <!-- options filled dynamically -->
+      </select>
+    </label>
 
-        <label>
-          <span>Event</span>
-          <input id="f-event" list="list-events" placeholder="Type or pick…" />
-          <datalist id="list-events"></datalist>
-        </label>
+    <label>
+      <span>Event</span>
+      <select id="f-event">
+        <option value="">All</option>
+        <!-- options filled dynamically -->
+      </select>
+    </label>
 
-        <label>
-          <span>Section</span>
-          <input id="f-section" list="list-sections" placeholder="e.g., 145" />
-          <datalist id="list-sections"></datalist>
-        </label>
+    <label>
+      <span>Section</span>
+      <input id="f-section" placeholder="e.g., 145" />
+    </label>
 
-        <label>
-          <span>Row</span>
-          <input id="f-row" list="list-rows" placeholder="e.g., F or 0" />
-          <datalist id="list-rows"></datalist>
-        </label>
+    <label>
+      <span>Row</span>
+      <input id="f-row" placeholder="e.g., F or 0" />
+    </label>
 
-        <label>
-          <span>Seat</span>
-          <input id="f-seat" placeholder="e.g., 12" />
-        </label>
+    <label>
+      <span>Seat</span>
+      <input id="f-seat" placeholder="e.g., 12" />
+    </label>
 
-        <label>
-          <span>Limit</span>
-          <select id="f-limit">
-            <option>50</option>
-            <option selected>200</option>
-            <option>500</option>
-            <option>1000</option>
-          </select>
-        </label>
+    <label>
+      <span>Limit</span>
+      <select id="f-limit">
+        <option>50</option>
+        <option selected>200</option>
+        <option>500</option>
+        <option>1000</option>
+      </select>
+    </label>
 
-        <label>
-          <span>Auto-refresh</span>
-          <select id="f-autorefresh">
-            <option value="2500">Every 2.5s</option>
-            <option value="5000" selected>Every 5s</option>
-            <option value="0">Paused</option>
-          </select>
-        </label>
+    <label>
+      <span>Auto-refresh</span>
+      <select id="f-autorefresh">
+        <option value="2500">Every 2.5s</option>
+        <option value="5000" selected>Every 5s</option>
+        <option value="0">Paused</option>
+      </select>
+    </label>
 
-        <label>
-          <span>Scope</span>
-          <select id="f-scope">
-            <option value="all" selected>All listings</option>
-            <option value="mine-session">Mine (session)</option>
-            <option value="mine-local">Mine (local IDs)</option>
-          </select>
-        </label>
+    <label>
+      <span>Scope</span>
+      <select id="f-scope">
+        <option value="all" selected>All</option>
+        <option value="mine-session">Mine</option>
+      </select>
+    </label>
 
-        <label>
-          <span>Pin matches first</span>
-          <select id="f-pin">
-            <option value="0" selected>No</option>
-            <option value="1">Yes</option>
-          </select>
-        </label>
-      </div>
-    </section>
+    <div>
+      <span style="display:inline-block;height:24px"></span>
+      <button id="f-reset" class="btn" type="button">Reset</button>
+    </div>
+  </div>
+</section>
+
 
     <div class="table-wrap">
       <table id="tickets-table">

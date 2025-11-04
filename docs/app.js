@@ -234,102 +234,103 @@ if (simForm) {
 }
 
 /* ----------------
-   Dashboard (filters + scope + autocomplete + pin-first)
+   Dashboard (simple selects + scope)
 -----------------*/
 const onDashboard = document.getElementById("tickets-table");
 if (onDashboard) {
-  const tbody = document.querySelector("#tickets-table tbody");
-
-  const decisionEl    = document.getElementById("f-decision");
-  const marketplaceEl = document.getElementById("f-marketplace");
-  const eventEl       = document.getElementById("f-event");
-  const sectionEl     = document.getElementById("f-section");
-  const rowEl         = document.getElementById("f-row");
-  const seatEl        = document.getElementById("f-seat");
-  const limitEl       = document.getElementById("f-limit");
-  const refreshEl     = document.getElementById("f-autorefresh");
-  const scopeEl       = document.getElementById("f-scope");
-  const pinEl         = document.getElementById("f-pin");
-
-  const dlMarkets = document.getElementById("list-marketplaces");
-  const dlEvents  = document.getElementById("list-events");
-  const dlSections= document.getElementById("list-sections");
-  const dlRows    = document.getElementById("list-rows");
+  const tbody        = document.querySelector("#tickets-table tbody");
+  const decisionEl   = document.getElementById("f-decision");
+  const marketplaceEl= document.getElementById("f-marketplace");
+  const eventEl      = document.getElementById("f-event");
+  const sectionEl    = document.getElementById("f-section");
+  const rowEl        = document.getElementById("f-row");
+  const seatEl       = document.getElementById("f-seat");
+  const limitEl      = document.getElementById("f-limit");
+  const refreshEl    = document.getElementById("f-autorefresh");
+  const scopeEl      = document.getElementById("f-scope");
+  const resetBtn     = document.getElementById("f-reset");
 
   let allRows = [];
   let sortKey = "created_at";
   let sortDir = "desc";
-  let timer = null;
+  let timer   = null;
 
   function setTimer() {
     if (timer) clearInterval(timer);
     const ms = parseInt(refreshEl.value, 10);
     if (ms > 0) timer = setInterval(load, ms);
   }
+
   function normalizeRowKey(v) {
     return String(v || "").toUpperCase().replace(/O/g, "0");
   }
+
+  function populateSelect(selectEl, values) {
+    const current = selectEl.value;
+    selectEl.innerHTML = '<option value="">All</option>' +
+      Array.from(new Set(values.filter(Boolean)))
+        .sort((a, b) => String(a).localeCompare(String(b)))
+        .map(v => `<option value="${String(v)}">${String(v)}</option>`)
+        .join("");
+    // restore selection if still present
+    if ([...selectEl.options].some(o => o.value === current)) {
+      selectEl.value = current;
+    }
+  }
+
+  function populateFiltersFromData(rows) {
+    populateSelect(marketplaceEl, rows.map(r => r.marketplace));
+    populateSelect(eventEl,       rows.map(r => r.event_id));
+  }
+
   function matches(row) {
-    const scope = scopeEl.value;
-    if (scope === "mine-session") {
-      if (!row.client_session || row.client_session !== TVG_SESSION) return false;
-    } else if (scope === "mine-local") {
-      const mine = getMyIds();
-      if (!mine.has(row.id)) return false;
+    // Scope: "All" or "Mine"
+    // "Mine" works in BOTH cases:
+    //   A) Server includes client_session on each row, OR
+    //   B) We saved the row IDs locally when you submitted (my IDs).
+    if (scopeEl.value === "mine") {
+      const hasServerSession = !!row.client_session;
+      if (hasServerSession) {
+        if (row.client_session !== TVG_SESSION) return false;
+      } else {
+        const mine = getMyIds();        // from top of app.js
+        if (!mine.has(row.id)) return false;
+      }
     }
-
+  
+    // Decision exact
     const d = (decisionEl.value || "").trim();
-    const m = (marketplaceEl.value || "").trim().toLowerCase();
-    const e = (eventEl.value || "").trim().toLowerCase();
-    const s = (sectionEl.value || "").trim();
-    const r = normalizeRowKey((rowEl.value || "").trim());
-    const seat = (seatEl.value || "").trim();
-
     if (d && row.decision !== d) return false;
-    if (m && !(row.marketplace || "").toLowerCase().includes(m)) return false;
-    if (e && !(row.event_id || "").toLowerCase().includes(e)) return false;
+  
+    // Marketplace exact (native <select>)
+    const m = (marketplaceEl.value || "").trim();
+    if (m && row.marketplace !== m) return false;
+  
+    // Event exact (native <select>)
+    const e = (eventEl.value || "").trim();
+    if (e && row.event_id !== e) return false;
+  
+    // Section typed
+    const s = (sectionEl.value || "").trim();
     if (s && String(row.section || "") !== s) return false;
-
-    if (r) {
-      const rowKey = normalizeRowKey(row.row);
-      if (rowKey !== r) return false;
-    }
+  
+    // Row typed with O/0 normalization
+    const r = normalizeRowKey((rowEl.value || "").trim());
+    if (r && normalizeRowKey(row.row) !== r) return false;
+  
+    // Seat typed
+    const seat = (seatEl.value || "").trim();
     if (seat && String(row.seat || "") !== seat) return false;
+  
     return true;
   }
-  function pinScore(row) {
-    if (pinEl.value !== "1") return 0;
-    let score = 0;
-    const m = (marketplaceEl.value || "").trim().toLowerCase();
-    const e = (eventEl.value || "").trim().toLowerCase();
-    const s = (sectionEl.value || "").trim();
-    const r = normalizeRowKey((rowEl.value || "").trim());
-    const seat = (seatEl.value || "").trim();
-    if (m && (row.marketplace || "").toLowerCase().includes(m)) score++;
-    if (e && (row.event_id || "").toLowerCase().includes(e)) score++;
-    if (s && String(row.section || "") === s) score++;
-    if (r && normalizeRowKey(row.row) === r) score++;
-    if (seat && String(row.seat || "") === seat) score++;
-    return score;
-  }
-  function populateDatalists(rows) {
-    const uniq = (arr) => Array.from(new Set(arr.filter(Boolean)));
-    const markets = uniq(rows.map(r => r.marketplace));
-    const events  = uniq(rows.map(r => r.event_id));
-    const sections= uniq(rows.map(r => String(r.section)));
-    const rowsU   = uniq(rows.map(r => String(r.row || "").toUpperCase()));
-    dlMarkets.innerHTML = markets.map(v => `<option value="${v}">`).join("");
-    dlEvents.innerHTML  = events.map(v => `<option value="${v}">`).join("");
-    dlSections.innerHTML= sections.map(v => `<option value="${v}">`).join("");
-    dlRows.innerHTML    = rowsU.map(v => `<option value="${v}">`).join("");
-  }
+  
+
   function draw() {
     const lim = parseInt(limitEl.value, 10) || 200;
     const rows = allRows
       .filter(matches)
       .sort((a, b) => {
-        const pa = pinScore(a), pb = pinScore(b);
-        if (pa !== pb) return pb - pa;
         const A = a[sortKey], B = b[sortKey];
         if (sortKey === "created_at") {
           const ta = new Date(A).getTime(), tb = new Date(B).getTime();
@@ -369,32 +370,57 @@ if (onDashboard) {
       tbody.appendChild(tr);
     });
   }
+
   async function load() {
     try {
       const rows = await fetchTickets();
       allRows = Array.isArray(rows) ? rows.slice().reverse() : [];
-      populateDatalists(allRows);
+      populateFiltersFromData(allRows);
       draw();
     } catch (e) {
       console.error("Failed to load tickets:", e);
     }
   }
+
+  // Sorting by clicking header
   document.querySelectorAll("#tickets-table thead th[data-sort]").forEach((th) => {
     th.style.cursor = "pointer";
     th.addEventListener("click", () => {
       const key = th.getAttribute("data-sort");
-      if (sortKey === key) { sortDir = sortDir === "asc" ? "desc" : "asc"; }
-      else { sortKey = key; sortDir = key === "created_at" ? "desc" : "asc"; }
+      if (sortKey === key) {
+        sortDir = sortDir === "asc" ? "desc" : "asc";
+      } else {
+        sortKey = key;
+        sortDir = key === "created_at" ? "desc" : "asc";
+      }
       draw();
     });
   });
-  [decisionEl, marketplaceEl, eventEl, sectionEl, rowEl, seatEl, limitEl, scopeEl, pinEl]
-    .forEach((el) => el.addEventListener("input", draw));
+
+  // Filter listeners
+  [decisionEl, marketplaceEl, eventEl, sectionEl, rowEl, seatEl, limitEl, scopeEl]
+    .forEach(el => el.addEventListener("input", draw));
+  [decisionEl, marketplaceEl, eventEl, limitEl, scopeEl]
+    .forEach(el => el.addEventListener("change", draw));
   refreshEl.addEventListener("change", setTimer);
+
+  // Reset button
+  resetBtn.addEventListener("click", () => {
+    decisionEl.value = "";
+    marketplaceEl.value = "";
+    eventEl.value = "";
+    sectionEl.value = "";
+    rowEl.value = "";
+    seatEl.value = "";
+    limitEl.value = "200";
+    scopeEl.value = "all";
+    draw();
+  });
 
   await load();
   setTimer();
 }
+
 
 /* --------------------------
    API Switcher (gear)
