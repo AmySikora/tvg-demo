@@ -367,3 +367,82 @@ option {
   color: #0a0f18;            /* dark text in dropdown list */
   background: #eaf2ff;       /* light option background */
 }
+/* ===== Responsive frame for the simulator form ===== */
+.frame{
+  position: relative;
+  width: 100%;
+  max-width: 920px;                 /* roomy on desktop */
+  margin: 0 auto;                   /* center the card */
+  padding: clamp(16px, 2vw, 24px);  /* responsive padding */
+  border-radius: 18px;
+  background: rgba(17,24,38,.66);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,255,255,.02) inset;
+}
+
+/* Soft ambient edge glow that scales with the card */
+.frame::before{
+  content:"";
+  position:absolute; inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 420px at 18% -10%, rgba(34,211,238,.12), transparent 65%),
+    radial-gradient(900px 420px at 85% -10%, rgba(99,102,241,.12), transparent 70%);
+  filter: saturate(1.1);
+  z-index: -1;
+}
+
+/* Grid inside the form: 2 columns on desktop, single column on phones */
+#sim-form .grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+/* Make the “Seat(s)” row span both columns on desktop */
+#sim-form .grid > label[style*="grid-column:1 / -1"]{
+  grid-column: 1 / -1 !important;
+}
+
+/* Inputs and selects never overflow the frame */
+#sim-form input,
+#sim-form select,
+#sim-form textarea{
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(10,14,22,.7);
+  color: var(--text, #e5e7eb);
+}
+
+/* The small preview card inside the frame matches spacing on mobile */
+#sim-form .card{
+  padding: clamp(12px, 1.6vw, 16px);
+}
+
+/* Primary submit button spans the card nicely while not feeling huge */
+#sim-form .btn{
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+}
+
+/* ===== Mobile tweaks ===== */
+@media (max-width: 860px){
+  .frame{ max-width: 720px; } /* tighten cap a bit */
+}
+
+@media (max-width: 720px){
+  #sim-form .grid{ grid-template-columns: 1fr; } /* stack fields */
+  .frame{ border-radius: 16px; }
+}
+
+@media (max-width: 420px){
+  .frame{ padding: 14px; border-radius: 14px; }
+}
