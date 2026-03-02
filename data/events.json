@@ -10,5 +10,11 @@
     "name": "Summer Fest — Day 1",
     "venue": "Seattle Center",
     "date": "2026-07-10T12:00:00-07:00"
+  },
+  "da3d28c744": {
+    "event_id": "da3d28c744",
+    "name": "Test Event",
+    "venue": "Test Venue",
+    "date": "2026-03-03T18:00:00-08:00"
   }
 }
