@@ -94,11 +94,11 @@ app.add_middleware(
 # ==============================
 
 EVENTS = {
-    "nfl-seahawks-2025-11-02": {
+    "nfl-seahawks-2026-11-02": {
         "event_id": "nfl-seahawks-2025-11-02",
         "name": "NFL — Seattle Seahawks vs. TBD (Home)",
         "venue": "Lumen Field, Seattle, WA",
-        "date": "2025-11-02T13:05:00-07:00",
+        "date": "2026-11-02T13:05:00-07:00",
     },
     "festival-summer-2026-day1": {
         "event_id": "festival-summer-2026-day1",
